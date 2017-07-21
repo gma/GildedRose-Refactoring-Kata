@@ -15,6 +15,10 @@ class GildedRose
     def reduce_days_remaining
       item.sell_in = item.sell_in - 1
     end
+
+    def modify_quality_when_out_of_date
+      modify_quality
+    end
   end
 
   class NormalStrategy < Strategy
@@ -50,6 +54,12 @@ class GildedRose
     def modify_quality
       increase_quality
     end
+
+    def modify_quality_when_out_of_date
+      if item.quality < 50
+        item.quality = item.quality + 1
+      end
+    end
   end
 
   class BackstagePassStrategy < PerishableStrategy
@@ -66,6 +76,10 @@ class GildedRose
           end
         end
       end
+    end
+
+    def modify_quality_when_out_of_date
+      item.quality = 0
     end
   end
 
@@ -87,19 +101,7 @@ class GildedRose
     @items.each do |item|
       item.modify_quality
       item.reduce_days_remaining
-      if item.sell_in < 0
-        if item.name != "Aged Brie"
-          if item.name != "Backstage passes to a TAFKAL80ETC concert"
-            item.modify_quality
-          else
-            item.quality = item.quality - item.quality
-          end
-        else
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
-        end
-      end
+      item.modify_quality_when_out_of_date if item.sell_in < 0
     end
   end
 end
