@@ -13,15 +13,15 @@ class GildedRose
     end
 
     def reduce_days_remaining
-      item.sell_in = item.sell_in - 1
+      self.sell_in = sell_in - 1
     end
 
     def out_of_date?
-      item.sell_in < 1
+      sell_in < 1
     end
 
     def modify_quality
-      item.quality = [[0, item.quality + change_in_quality].max, 50].min
+      self.quality = [[0, quality + change_in_quality].max, 50].min
     end
   end
 
@@ -55,10 +55,10 @@ class GildedRose
     def change_in_quality
       case
       when out_of_date?
-        -item.quality
-      when item.sell_in < 6
+        -quality
+      when sell_in < 6
         3
-      when item.sell_in < 11
+      when sell_in < 11
         2
       else
         1
