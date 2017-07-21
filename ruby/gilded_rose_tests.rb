@@ -6,6 +6,20 @@ class TestUntitled < Test::Unit::TestCase
     GildedRose.new([item]).update_quality()
   end
 
+  def test_quality_cant_fall_below_lower_limit
+    lowest_quality = 0
+    item = Item.new('Normal item', 1, lowest_quality)
+    update_quality(item)
+    assert_equal lowest_quality, item.quality
+  end
+
+  def test_quality_cant_exceed_upper_limit
+    highest_quality = 50
+    item = Item.new('Aged Brie', 1, highest_quality)
+    update_quality(item)
+    assert_equal highest_quality, item.quality
+  end
+
   def test_aged_brie_quality_increases
     quality = 1
     brie = Item.new('Aged Brie', 1, quality)

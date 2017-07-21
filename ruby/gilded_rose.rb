@@ -20,20 +20,14 @@ class GildedRose
       item.sell_in < 1
     end
 
-    def reduce_quality
-      if item.quality > 0
-        item.quality = item.quality - quality_reduction_for_age
-      end
+    def modify_quality
+      item.quality = [[0, item.quality + change_in_quality].max, 50].min
     end
   end
 
   class NormalStrategy < Strategy
-    def quality_reduction_for_age
-      out_of_date? ? 2 : 1
-    end
-
-    def modify_quality
-      reduce_quality
+    def change_in_quality
+      out_of_date? ? -2 : -1
     end
   end
 
@@ -46,44 +40,29 @@ class GildedRose
   end
 
   class ConjuredStrategy < Strategy
-    def quality_reduction_for_age
-      out_of_date? ? 4 : 2
-    end
-
-    def modify_quality
-      reduce_quality
-    end
-  end
-
-  module Perishable
-    def increase_quality
-      if item.quality < 50
-        item.quality = item.quality + 1
-      end
+    def change_in_quality
+      out_of_date? ? -4 : -2
     end
   end
 
   class AgedBrieStrategy < Strategy
-    include Perishable
-
-    def modify_quality
-      increase_quality
-      increase_quality if out_of_date?
+    def change_in_quality
+      out_of_date? ? 2 : 1
     end
   end
 
   class BackstagePassStrategy < Strategy
-    include Perishable
-
-    def quality_reduction_for_age
-      out_of_date? ? item.quality : 0
-    end
-
-    def modify_quality
-      increase_quality
-      increase_quality if item.sell_in < 11
-      increase_quality if item.sell_in < 6
-      reduce_quality
+    def change_in_quality
+      case
+      when out_of_date?
+        -item.quality
+      when item.sell_in < 6
+        3
+      when item.sell_in < 11
+        2
+      else
+        1
+      end
     end
   end
 
