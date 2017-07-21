@@ -1,39 +1,53 @@
+require 'forwardable'
+
 class GildedRose
 
-  def initialize(items)
-    @items = items
+  class Strategy
+    extend Forwardable
+
+    attr_accessor :item
+    def_delegators :@item, :name, :sell_in, :sell_in=, :quality, :quality=
+
+    def initialize(item)
+      @item = item
+    end
   end
 
-  def update_quality()
-    @items.each do |item|
-      if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
-        decrease_quality(item)
-      else
-        increase_quality(item)
-      end
-      if item.name != "Sulfuras, Hand of Ragnaros"
-        item.sell_in = item.sell_in - 1
-      end
-      if item.sell_in < 0
-        if item.name != "Aged Brie"
-          if item.name != "Backstage passes to a TAFKAL80ETC concert"
-            decrease_quality(item)
-          else
-            item.quality = item.quality - item.quality
-          end
-        else
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
-        end
+  class NormalStrategy < Strategy
+    def modify_quality
+      item.quality = item.quality - 1 if item.quality > 0
+    end
+  end
+
+  class SulfurasStrategy < Strategy
+    def modify_quality
+    end
+  end
+
+  class ConjuredStrategy < Strategy
+    def modify_quality
+      item.quality = item.quality - 2 if item.quality > 0
+    end
+  end
+
+  class PerishableStrategy < Strategy
+    def increase_quality(&block)
+      if item.quality < 50
+        item.quality = item.quality + 1
+        yield if block_given?
       end
     end
   end
 
-  def increase_quality(item)
-    if item.quality < 50
-      item.quality = item.quality + 1
-      if item.name == "Backstage passes to a TAFKAL80ETC concert"
+  class AgedBrieStrategy < PerishableStrategy
+    def modify_quality
+      increase_quality
+    end
+  end
+
+  class BackstagePassStrategy < PerishableStrategy
+    def modify_quality
+      increase_quality do
         if item.sell_in < 11
           if item.quality < 50
             item.quality = item.quality + 1
@@ -48,11 +62,38 @@ class GildedRose
     end
   end
 
-  def decrease_quality(item)
-    if item.quality > 0
+  def initialize(items)
+    @items = items.map { |item| strategy_for(item) }
+  end
+
+  def strategy_for(item)
+    cls = {
+      'Aged Brie' => AgedBrieStrategy,
+      'Backstage passes to a TAFKAL80ETC concert' => BackstagePassStrategy,
+      'Conjured' => ConjuredStrategy,
+      'Sulfuras, Hand of Ragnaros' => SulfurasStrategy
+    }.fetch(item.name, NormalStrategy)
+    cls.new(item)
+  end
+
+  def update_quality()
+    @items.each do |item|
+      item.modify_quality
       if item.name != "Sulfuras, Hand of Ragnaros"
-        item.quality = item.quality - 1
-        item.quality = item.quality - 1 if item.name == "Conjured"
+        item.sell_in = item.sell_in - 1
+      end
+      if item.sell_in < 0
+        if item.name != "Aged Brie"
+          if item.name != "Backstage passes to a TAFKAL80ETC concert"
+            item.modify_quality
+          else
+            item.quality = item.quality - item.quality
+          end
+        else
+          if item.quality < 50
+            item.quality = item.quality + 1
+          end
+        end
       end
     end
   end
