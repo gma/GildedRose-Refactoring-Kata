@@ -56,10 +56,9 @@ class GildedRose
   end
 
   module Perishable
-    def increase_quality(&block)
+    def increase_quality
       if item.quality < 50
         item.quality = item.quality + 1
-        yield if block_given?
       end
     end
   end
@@ -81,10 +80,9 @@ class GildedRose
     end
 
     def modify_quality
-      increase_quality do
-        increase_quality if item.sell_in < 11
-        increase_quality if item.sell_in < 6
-      end
+      increase_quality
+      increase_quality if item.sell_in < 11
+      increase_quality if item.sell_in < 6
       reduce_quality
     end
   end
