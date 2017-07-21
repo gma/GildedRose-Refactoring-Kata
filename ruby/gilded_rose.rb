@@ -56,25 +56,15 @@ class GildedRose
     end
 
     def modify_quality_when_out_of_date
-      if item.quality < 50
-        item.quality = item.quality + 1
-      end
+      increase_quality
     end
   end
 
   class BackstagePassStrategy < PerishableStrategy
     def modify_quality
       increase_quality do
-        if item.sell_in < 11
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
-        end
-        if item.sell_in < 6
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
-        end
+        increase_quality if item.sell_in < 11
+        increase_quality if item.sell_in < 6
       end
     end
 
