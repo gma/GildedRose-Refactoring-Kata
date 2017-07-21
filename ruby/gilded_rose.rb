@@ -20,14 +20,20 @@ class GildedRose
       item.sell_in < 1
     end
 
-    def modify_quality_when_out_of_date
-      modify_quality if out_of_date?
+    def reduce_quality
+      if item.quality > 0
+        item.quality = item.quality - quality_reduction_for_age
+      end
     end
   end
 
   class NormalStrategy < Strategy
+    def quality_reduction_for_age
+      out_of_date? ? 2 : 1
+    end
+
     def modify_quality
-      item.quality = item.quality - 1 if item.quality > 0
+      reduce_quality
     end
   end
 
@@ -40,8 +46,12 @@ class GildedRose
   end
 
   class ConjuredStrategy < Strategy
+    def quality_reduction_for_age
+      out_of_date? ? 4 : 2
+    end
+
     def modify_quality
-      item.quality = item.quality - 2 if item.quality > 0
+      reduce_quality
     end
   end
 
@@ -57,23 +67,21 @@ class GildedRose
   class AgedBrieStrategy < PerishableStrategy
     def modify_quality
       increase_quality
-    end
-
-    def modify_quality_when_out_of_date
       increase_quality if out_of_date?
     end
   end
 
   class BackstagePassStrategy < PerishableStrategy
+    def quality_reduction_for_age
+      out_of_date? ? item.quality : 0
+    end
+
     def modify_quality
       increase_quality do
         increase_quality if item.sell_in < 11
         increase_quality if item.sell_in < 6
       end
-    end
-
-    def modify_quality_when_out_of_date
-      item.quality = 0 if out_of_date?
+      reduce_quality
     end
   end
 
@@ -94,7 +102,6 @@ class GildedRose
   def update_quality()
     @items.each do |item|
       item.modify_quality
-      item.modify_quality_when_out_of_date
       item.reduce_days_remaining
     end
   end

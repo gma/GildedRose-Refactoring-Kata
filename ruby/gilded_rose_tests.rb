@@ -21,8 +21,8 @@ class TestUntitled < Test::Unit::TestCase
   end
 
   def test_conjured_item_degrades_twice_as_fast
-    normal = Item.new('Normal', 1, 2)
-    conjured = Item.new('Conjured', 1, 2)
+    normal = Item.new('Normal', 2, 2)
+    conjured = Item.new('Conjured', 2, 2)
     update_quality(conjured)
     2.times { update_quality(normal) }
     assert_equal normal.quality, conjured.quality
