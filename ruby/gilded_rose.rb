@@ -55,7 +55,7 @@ class GildedRose
     end
   end
 
-  class PerishableStrategy < Strategy
+  module Perishable
     def increase_quality(&block)
       if item.quality < 50
         item.quality = item.quality + 1
@@ -64,14 +64,18 @@ class GildedRose
     end
   end
 
-  class AgedBrieStrategy < PerishableStrategy
+  class AgedBrieStrategy < Strategy
+    include Perishable
+
     def modify_quality
       increase_quality
       increase_quality if out_of_date?
     end
   end
 
-  class BackstagePassStrategy < PerishableStrategy
+  class BackstagePassStrategy < Strategy
+    include Perishable
+
     def quality_reduction_for_age
       out_of_date? ? item.quality : 0
     end
