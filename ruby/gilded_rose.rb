@@ -32,10 +32,11 @@ class GildedRose
   end
 
   class SulfurasStrategy < Strategy
-    def modify_quality
+    def reduce_days_remaining
     end
 
-    def reduce_days_remaining
+    def change_in_quality
+      0
     end
   end
 
