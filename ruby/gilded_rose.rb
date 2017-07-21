@@ -11,6 +11,10 @@ class GildedRose
     def initialize(item)
       @item = item
     end
+
+    def reduce_days_remaining
+      item.sell_in = item.sell_in - 1
+    end
   end
 
   class NormalStrategy < Strategy
@@ -21,6 +25,9 @@ class GildedRose
 
   class SulfurasStrategy < Strategy
     def modify_quality
+    end
+
+    def reduce_days_remaining
     end
   end
 
@@ -79,9 +86,7 @@ class GildedRose
   def update_quality()
     @items.each do |item|
       item.modify_quality
-      if item.name != "Sulfuras, Hand of Ragnaros"
-        item.sell_in = item.sell_in - 1
-      end
+      item.reduce_days_remaining
       if item.sell_in < 0
         if item.name != "Aged Brie"
           if item.name != "Backstage passes to a TAFKAL80ETC concert"
