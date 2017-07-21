@@ -16,8 +16,12 @@ class GildedRose
       item.sell_in = item.sell_in - 1
     end
 
+    def out_of_date?
+      item.sell_in < 1
+    end
+
     def modify_quality_when_out_of_date
-      modify_quality
+      modify_quality if out_of_date?
     end
   end
 
@@ -56,7 +60,7 @@ class GildedRose
     end
 
     def modify_quality_when_out_of_date
-      increase_quality
+      increase_quality if out_of_date?
     end
   end
 
@@ -69,7 +73,7 @@ class GildedRose
     end
 
     def modify_quality_when_out_of_date
-      item.quality = 0
+      item.quality = 0 if out_of_date?
     end
   end
 
@@ -90,8 +94,8 @@ class GildedRose
   def update_quality()
     @items.each do |item|
       item.modify_quality
+      item.modify_quality_when_out_of_date
       item.reduce_days_remaining
-      item.modify_quality_when_out_of_date if item.sell_in < 0
     end
   end
 end

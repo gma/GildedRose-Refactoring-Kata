@@ -52,7 +52,7 @@ class TestUntitled < Test::Unit::TestCase
 
   def test_outdated_normal_item_degrades_quality
     quality = 4
-    sell_in = -1
+    sell_in = 0
     normal = Item.new('Normal', sell_in, quality)
     update_quality(normal)
     assert_equal quality - 2, normal.quality
