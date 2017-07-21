@@ -25,18 +25,18 @@ class GildedRose
     end
   end
 
-  class NormalStrategy < Strategy
-    def change_in_quality
-      out_of_date? ? -2 : -1
-    end
-  end
-
   class SulfurasStrategy < Strategy
     def reduce_days_remaining
     end
 
     def change_in_quality
       0
+    end
+  end
+
+  class NormalStrategy < Strategy
+    def change_in_quality
+      out_of_date? ? -2 : -1
     end
   end
 
